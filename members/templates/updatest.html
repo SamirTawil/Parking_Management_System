@@ -1,0 +1,12 @@
+<h1>Update member</h1>
+
+<form action="updaterecordst/{{ mystudent.id }}" method="post">
+{% csrf_token %}
+Batiment:<br>
+<input name="batiment" value="{{ mystudent.batiment }}">
+<br><br>
+Nombre de place:<br>
+<input name="nbre" value="{{ mystudent.nbre }}">
+<br><br>
+<input type="submit" value="Submit">
+</form>

@@ -1,0 +1,12 @@
+<h1>Ajouter un batiment</h1>
+
+<form action="addrecord/" method="post">
+{% csrf_token %}
+Batiment:<br>
+<input name="batiment">
+<br><br>
+Nbr:<br>
+<input name="nbr">
+<br><br>
+<input type="submit" value="Submit">
+</form>

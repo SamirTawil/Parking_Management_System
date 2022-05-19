@@ -1,0 +1,16 @@
+<h1>Etudiant</h1>
+
+<table border="1">
+{% for y in mystudent %}
+<tr>
+<td><a href="updatest/{{ y.id }}">{{ y.id }}</a></td>
+<td>{{ y.batiment }}</td>
+<td>{{ y.nbre }}</td>
+<td><a href="deletest/{{ y.id }}">delete</a></td>
+</tr>
+{% endfor %}
+</table>
+
+<p>
+<a href="addst/">Add member</a>
+</p>
