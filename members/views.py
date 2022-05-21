@@ -1,9 +1,23 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Members
-from .models import Etudiant
+from .models import MyUser, ParkingSpot
+
+prof_parking_per_building = 50
+student_parking_per_building = 100
+
+
+# @user_passes_test(user_is_prof, login_url="login")   PROF
+# @user_passes_test(user_is_student, login_url="login")   STUDENT
+
+
+def user_is_prof(user):
+    return user.role == "Professor"
+
+
+def user_is_student(user):
+    return user.role == "Student"
 
 
 def index(request):
@@ -17,7 +31,8 @@ def admin(request):
 
 
 def etudian(request):
-    mystudent = Etudiant.objects.all().values()
+    # mystudent = Etudiant.objects.all().values()
+    mystudent = MyUser.objects.filter(role="Student").values()
     template = loader.get_template('index2.html')
     context = {
         'mystudent': mystudent,
@@ -32,7 +47,7 @@ def administration(request):
 
 
 def prof(request):
-    mymembers = Members.objects.all().values()
+    mymembers = MyUser.objects.filter(role="Professor").values()
     template = loader.get_template('index1.html')
     context = {
         'mymembers': mymembers,
@@ -47,7 +62,7 @@ def username(request):
 
 
 def pf(request):
-    mymembers = Members.objects.all().values()
+    mymembers = MyUser.objects.filter(role="Professor").values()
     template = loader.get_template('index.html')
     context = {
         'mymembers': mymembers,
@@ -66,21 +81,24 @@ def add(request):
 def addrecord(request):
     x = request.POST['batiment']
     y = request.POST['nbr']
-    member = Members(batiment=x, nbr=y)
+    # member = Members(batiment=x, nbr=y)
+    member = MyUser(role="Professor", current_spot_id=ParkingSpot.objects.create(batiment=x, nbr=y).id)
     member.save()
     return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def delete(request, id):
-    member = Members.objects.get(id=id)
+    # member = Members.objects.get(id=id)
+    member = MyUser.objects.get(role="Professor", id=id)
     member.delete()
     return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def update(request, id):
-    mymember = Members.objects.get(id=id)
+    # mymember = Members.objects.get(id=id)
+    mymember = MyUser.objects.get(role="Professor", id=id)
     template = loader.get_template('update.html')
     context = {
         'mymember': mymember,
@@ -92,7 +110,8 @@ def update(request, id):
 def updaterecord(request, id):
     batiment = request.POST['batiment']
     nbr = request.POST['nbr']
-    member = Members.objects.get(id=id)
+    # member = Members.objects.get(id=id)
+    member = MyUser.objects.get(role="Professor", id=id)
     member.batiment = batiment
     member.nbr = nbr
     member.save()
@@ -100,7 +119,8 @@ def updaterecord(request, id):
 
 
 def pe(request):
-    mystudent = Etudiant.objects.all().values()
+    # mystudent = Etudiant.objects.all().values()
+    mystudent = MyUser.objects.filter(role="Student").values()
     template = loader.get_template('indexst.html')
     context = {
         'mystudent': mystudent,
@@ -119,21 +139,24 @@ def addst(request):
 def addrecordst(request):
     z = request.POST['batiment']
     t = request.POST['nbre']
-    stu = Etudiant(batiment=z, nbre=t)
+    # stu = Etudiant(batiment=z, nbre=t)
+    stu = MyUser(role="Student", current_spot_id=ParkingSpot.objects.create(batiment=z, nbre=t).id)
     stu.save()
     return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def deletest(request, id):
-    stu = Etudiant.objects.get(id=id)
+    # stu = Etudiant.objects.get(id=id)
+    stu = MyUser.objects.get(id=id, role="Student")
     stu.delete()
     return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def updatest(request, id):
-    mystudent = Etudiant.objects.get(id=id)
+    # mystudent = Etudiant.objects.get(id=id)
+    mystudent = MyUser.objects.get(id=id, role="Student")
     template = loader.get_template('updatest.html')
     context = {
         'mystudent': mystudent,
@@ -145,8 +168,19 @@ def updatest(request, id):
 def updaterecordst(request, id):
     batiment = request.POST['batiment']
     nbre = request.POST['nbre']
-    stu = Etudiant.objects.get(id=id)
+    # stu = Etudiant.objects.get(id=id)
+    stu = MyUser.objects.get(id=id, role="Student")
     stu.batiment = batiment
     stu.nbre = nbre
     stu.save()
     return HttpResponseRedirect(reverse('index'))
+
+
+def remaining_student_spots(batiment):
+    taken_spots = ParkingSpot.objects.filter(batiment=batiment, user__role="Student")
+    return student_parking_per_building - len(taken_spots)
+
+
+def remaining_prof_spots(batiment):
+    taken_spots = ParkingSpot.objects.filter(batiment=batiment, user__role="Professor")
+    return prof_parking_per_building - len(taken_spots)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from members.models import Members, Etudiant
+from members.models import MyUser, ParkingSpot
 
-admin.site.register(Members)
-admin.site.register(Etudiant)
+admin.site.register(MyUser)
+admin.site.register(ParkingSpot)

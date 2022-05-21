@@ -3,14 +3,14 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-  
-    path('administration',views.administration),
-    path('etudian',views.etudian),
-    path('prof',views.prof),
-    path('pe',views.pe),
-    path('pf',views.pf),
 
-    path('username',views.username),
+    path('administration', views.administration),
+    path('etudian', views.etudian),
+    path('prof', views.prof),
+    path('pe', views.pe),
+    path('pf', views.pf),
+
+    path('username', views.username),
     path('add/', views.add, name='add'),
     path('add/addrecord/', views.addrecord, name='addrecord'),
     path('delete/<int:id>', views.delete, name='delete'),
